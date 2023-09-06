@@ -23,19 +23,29 @@ func main() {
 	listURL := flag.String("uf", "multiple urls", "a list of urls of target websites")
 	flag.Parse()
 
-	now := time.Now()
-	fileName := "httprr_" + now.Format("20060102150405") + ".txt"
-	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	uFlagStatus := isFlagPassed("u")
+	ufFlagStatus := isFlagPassed("uf")
 
-	if err != nil {
-		log.Fatalf("Failed creating file: %s", err)
+	var file *os.File
+	var errFile error
+
+	if uFlagStatus || ufFlagStatus {
+		now := time.Now()
+		fileName := "httprr_" + now.Format("20060102150405") + ".txt"
+		file, errFile = os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+		if errFile != nil {
+			log.Fatalf("Failed creating file: %s", errFile)
+		}
+	} else {
+		log.Fatalf("URL not provided")
 	}
 
-	if flagStatus := isFlagPassed("u"); flagStatus {
+	if uFlagStatus {
 		GetHeaders(*singleURL, file)
 	}
 
-	if flagStatus := isFlagPassed("uf"); flagStatus {
+	if ufFlagStatus {
 		readListURL, err := os.Open(*listURL)
 
 		if err != nil {
