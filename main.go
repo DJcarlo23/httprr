@@ -19,12 +19,18 @@ func isFlagPassed(name string) bool {
 }
 
 func main() {
-	singleURL := flag.String("u", "single url", "a url of the target website")
+	singleURL := flag.String("u", "single url", "a url of target website")
 	listURL := flag.String("uf", "multiple urls", "a list of urls of target websites")
+	protocolType := flag.String("p", "protocol type", "protocol which will be used to connect to the website")
 	flag.Parse()
 
 	uFlagStatus := isFlagPassed("u")
 	ufFlagStatus := isFlagPassed("uf")
+	pFlagStatus := isFlagPassed("p")
+
+	if !pFlagStatus {
+		*protocolType = "https"
+	}
 
 	var file *os.File
 	var errFile error
@@ -42,7 +48,7 @@ func main() {
 	}
 
 	if uFlagStatus {
-		GetHeaders(*singleURL, file)
+		GetHeaders(*singleURL, *protocolType, file)
 	}
 
 	if ufFlagStatus {
@@ -56,7 +62,7 @@ func main() {
 		fileScanner.Split(bufio.ScanLines)
 
 		for fileScanner.Scan() {
-			GetHeaders(fileScanner.Text(), file)
+			GetHeaders(fileScanner.Text(), *protocolType, file)
 		}
 
 		readListURL.Close()
