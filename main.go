@@ -19,13 +19,13 @@ func isFlagPassed(name string) bool {
 }
 
 func main() {
-	singleURL := flag.String("u", "single url", "a url of target website")
-	listURL := flag.String("uf", "multiple urls", "a list of urls of target websites")
+	singleDomain := flag.String("d", "single domain", "a domain of target website")
+	listDomain := flag.String("df", "multiple domains", "a list of domains of target websites")
 	protocolType := flag.String("p", "protocol type", "protocol which will be used to connect to the website")
 	flag.Parse()
 
-	uFlagStatus := isFlagPassed("u")
-	ufFlagStatus := isFlagPassed("uf")
+	dFlagStatus := isFlagPassed("d")
+	dfFlagStatus := isFlagPassed("df")
 	pFlagStatus := isFlagPassed("p")
 
 	if !pFlagStatus {
@@ -35,7 +35,7 @@ func main() {
 	var file *os.File
 	var errFile error
 
-	if uFlagStatus || ufFlagStatus {
+	if dFlagStatus || dfFlagStatus {
 		now := time.Now()
 		fileName := "httprr_" + now.Format("20060102150405") + ".txt"
 		file, errFile = os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -44,28 +44,28 @@ func main() {
 			log.Fatalf("Failed creating file: %s", errFile)
 		}
 	} else {
-		log.Fatalf("URL not provided")
+		log.Fatalf("Domain not provided")
 	}
 
-	if uFlagStatus {
-		GetHeaders(*singleURL, *protocolType, file)
+	if dFlagStatus {
+		GetHeaders(*singleDomain, *protocolType, file)
 	}
 
-	if ufFlagStatus {
-		readListURL, err := os.Open(*listURL)
+	if dfFlagStatus {
+		readListDomains, err := os.Open(*listDomain)
 
 		if err != nil {
-			log.Fatalf("Failed reading file with urls: %s", err)
+			log.Fatalf("Failed reading file with domains: %s", err)
 		}
 
-		fileScanner := bufio.NewScanner(readListURL)
+		fileScanner := bufio.NewScanner(readListDomains)
 		fileScanner.Split(bufio.ScanLines)
 
 		for fileScanner.Scan() {
 			GetHeaders(fileScanner.Text(), *protocolType, file)
 		}
 
-		readListURL.Close()
+		readListDomains.Close()
 	}
 
 	file.Close()
