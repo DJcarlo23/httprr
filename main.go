@@ -48,7 +48,8 @@ func main() {
 	}
 
 	if dFlagStatus {
-		GetHeaders(*singleDomain, *protocolType, file)
+		domain := []string{*singleDomain}
+		GetHeadersMultithreading(domain, *protocolType, file, 1)
 	}
 
 	if dfFlagStatus {
@@ -61,10 +62,13 @@ func main() {
 		fileScanner := bufio.NewScanner(readListDomains)
 		fileScanner.Split(bufio.ScanLines)
 
+		domains := make([]string, 0)
+
 		for fileScanner.Scan() {
-			GetHeaders(fileScanner.Text(), *protocolType, file)
+			domains = append(domains, fileScanner.Text())
 		}
 
+		GetHeadersMultithreading(domains, *protocolType, file, 5)
 		readListDomains.Close()
 	}
 
