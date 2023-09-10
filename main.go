@@ -19,9 +19,10 @@ func isFlagPassed(name string) bool {
 }
 
 func main() {
-	singleDomain := flag.String("d", "single domain", "a domain of target website")
-	listDomain := flag.String("df", "multiple domains", "a list of domains of target websites")
-	protocolType := flag.String("p", "protocol type", "protocol which will be used to connect to the website")
+	singleDomain := flag.String("d", "single", "a domain of target website")
+	listDomain := flag.String("df", "multiple", "a list of domains of target websites")
+	protocolType := flag.String("p", "protocol", "protocol which will be used to connect to the website")
+	numDomainsThread := flag.Int("t", 10, "number of domains handled by a single thread")
 	flag.Parse()
 
 	dFlagStatus := isFlagPassed("d")
@@ -68,7 +69,7 @@ func main() {
 			domains = append(domains, fileScanner.Text())
 		}
 
-		GetHeadersMultithreading(domains, *protocolType, file, 5)
+		GetHeadersMultithreading(domains, *protocolType, file, *numDomainsThread)
 		readListDomains.Close()
 	}
 
